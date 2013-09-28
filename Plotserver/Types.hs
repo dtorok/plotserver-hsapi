@@ -25,7 +25,7 @@ instance Show PlotData where
 
 instance Read PlotData where
 	readsPrec _ s = [(PlotData dataRows, "")] where
-		rows = splitOn "\n" s
+		rows = filter (not.null) $ splitOn "\n" s
 		dataRows = map createDataRow rows
 		createDataRow row = createDataTuple $ splitOn "," row
 		createDataTuple (key:sValues) = (key, map read sValues) :: (String, [Int]) -- just for the readibility
