@@ -16,5 +16,6 @@ Executable plotserver-api
 Library
   Build-Depends:	base >= 3 && < 5
   Exposed-modules:	Plotserver.Api
-  ghc-options:		-Wall
+  extensions:       OverloadedStrings
+  ghc-options:	    -Wall
 
