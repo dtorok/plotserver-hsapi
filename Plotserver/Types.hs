@@ -2,8 +2,8 @@
 
 module Plotserver.Types where
 
-import Data.List
-import Data.List.Split
+import Data.List (intercalate)
+import Data.List.Split (splitOn)
 
 -- TODO what if there isn't any password?
 data Config = Config {
