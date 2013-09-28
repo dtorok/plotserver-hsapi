@@ -1,0 +1,20 @@
+Name:			plotserver-api
+Version:		0.0
+Description:		Plotserver API
+License:		GPL
+--License-file:		LICENSE
+Author:			Daniel Torok
+Maintainer:		daniel.torok@prezi.com
+Build-Type:		Simple
+Cabal-Version:		>=1.2
+
+Executable plotserver-api
+  Main-is:		Test.hs
+  Build-Depends:	base >= 3 && < 5,
+                    curl
+
+Library
+  Build-Depends:	base >= 3 && < 5
+  Exposed-modules:	Plotserver.Api
+  ghc-options:		-Wall
+
