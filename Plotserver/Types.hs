@@ -12,19 +12,19 @@ data Config = Config {
 	password :: String
 }
 
-data Data = Data [DataRow]
-type DataRow = (String, [Int])
+data PlotData = PlotData [PlotDataRow]
+type PlotDataRow = (String, [Int])
 
-instance Show Data where
-	show (Data rows) = intercalate "\n" $ map showRow rows where
+instance Show PlotData where
+	show (PlotData rows) = intercalate "\n" $ map showRow rows where
 				showRow :: (String, [Int]) -> String
 				showRow (key, values) = key ++ ", " ++ showValues values
 
 				showValues :: [Int] -> String
 				showValues values = intercalate ", " (map show values)
 
-instance Read Data where
-	readsPrec _ s = [(Data dataRows, "")] where
+instance Read PlotData where
+	readsPrec _ s = [(PlotData dataRows, "")] where
 		rows = splitOn "\n" s
 		dataRows = map createDataRow rows
 		createDataRow row = createDataTuple $ splitOn "," row
