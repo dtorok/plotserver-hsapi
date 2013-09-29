@@ -17,13 +17,13 @@ plotUrl :: String -> String
 plotUrl dataset = "https://plot.prezi.com/" ++ dataset
 
 plotCat :: (String, String) -> String -> IO PlotData
-plotCat auth dataset = succOrError <$> plotCatSafe auth dataset
+plotCat auth dataset = leftOrError <$> plotCatSafe auth dataset
 
 plotUpdate :: (String, String) -> String -> String -> String -> IO PlotData
-plotUpdate auth dataset key values = succOrError <$> plotUpdateSafe auth dataset key values
+plotUpdate auth dataset key values = leftOrError <$> plotUpdateSafe auth dataset key values
 
 plotDelete :: (String, String) -> String -> IO PlotData
-plotDelete auth dataset = succOrError <$> plotDeleteSafe auth dataset
+plotDelete auth dataset = leftOrError <$> plotDeleteSafe auth dataset
 
 ------ SAFE API ------
 
@@ -48,9 +48,9 @@ plotDeleteSafe auth dataset = getResult <$> curlGetResponse_ url_ opts where
 
 ------ helpers ------
 
-succOrError :: Either PlotData String -> PlotData
-succOrError (Left plotdata) = plotdata
-succOrError (Right msg) = error msg
+leftOrError :: Either a String -> a
+leftOrError (Left a) = a
+leftOrError (Right msg) = error msg
 
 defaultOpts :: (String, String) -> [CurlOption]
 defaultOpts (username, password) = [
