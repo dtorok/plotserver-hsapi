@@ -1,24 +1,39 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Plotserver.Api (url, cat, update, delete) where
+module Plotserver.Api (
+	plotUrl, 
+	plotCat, plotUpdate, plotDelete,
+	plotCatSafe, plotUpdateSafe, plotDeleteSafe
+	) where
 
 import Network.Curl
-import Control.Applicative
+import Control.Applicative ((<$>))
 
 import Plotserver.Types
 
 ------ API ------
 
-url :: String -> String
-url dataset = "https://plot.prezi.com/" ++ dataset
+plotUrl :: String -> String
+plotUrl dataset = "https://plot.prezi.com/" ++ dataset
 
-cat :: (String, String) -> String -> IO (Either PlotData String)
-cat auth dataset = getResult <$> curlGetResponse_ url_ opts where
+plotCat :: (String, String) -> String -> IO PlotData
+plotCat auth dataset = succOrError <$> plotCatSafe auth dataset
+
+plotUpdate :: (String, String) -> String -> String -> String -> IO PlotData
+plotUpdate auth dataset key values = succOrError <$> plotUpdateSafe auth dataset key values
+
+plotDelete :: (String, String) -> String -> IO PlotData
+plotDelete auth dataset = succOrError <$> plotDeleteSafe auth dataset
+
+------ SAFE API ------
+
+plotCatSafe :: (String, String) -> String -> IO (Either PlotData String)
+plotCatSafe auth dataset = getResult <$> curlGetResponse_ url_ opts where
 	url_ = actionUrl dataset "download"
 	opts = defaultOpts auth
 
-update :: (String, String) -> String -> String -> String -> IO (Either PlotData String)
-update auth dataset key values = getResult <$> curlGetResponse_ url_ opts where
+plotUpdateSafe :: (String, String) -> String -> String -> String -> IO (Either PlotData String)
+plotUpdateSafe auth dataset key values = getResult <$> curlGetResponse_ url_ opts where
 	postData = key ++ "," ++ values
 	url_ = actionUrl dataset "update"
 	opts = defaultOpts auth ++ [
@@ -26,12 +41,16 @@ update auth dataset key values = getResult <$> curlGetResponse_ url_ opts where
 		CurlPostFields [postData]
 		]
 
-delete :: (String, String) -> String -> IO (Either PlotData String)
-delete auth dataset = getResult <$> curlGetResponse_ url_ opts where
+plotDeleteSafe :: (String, String) -> String -> IO (Either PlotData String)
+plotDeleteSafe auth dataset = getResult <$> curlGetResponse_ url_ opts where
 	url_ = actionUrl dataset "delete"
 	opts = defaultOpts auth
 
 ------ helpers ------
+
+succOrError :: Either PlotData String -> PlotData
+succOrError (Left plotdata) = plotdata
+succOrError (Right msg) = error msg
 
 defaultOpts :: (String, String) -> [CurlOption]
 defaultOpts (username, password) = [
@@ -41,7 +60,7 @@ defaultOpts (username, password) = [
 	]
 
 actionUrl :: String -> String -> String
-actionUrl dataset action = url dataset ++ "?" ++ action
+actionUrl dataset action = plotUrl dataset ++ "?" ++ action
 
 getResult :: CurlResponse_ [(String, String)] String -> Either PlotData String
 getResult response 
