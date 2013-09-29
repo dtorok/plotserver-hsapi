@@ -8,14 +8,9 @@ Maintainer:		daniel.torok@prezi.com
 Build-Type:		Simple
 Cabal-Version:		>=1.2
 
-Executable plotserver-api
-  Main-is:		Test.hs
-  Build-Depends:	base >= 3 && < 5,
-                    curl
-
 Library
   Build-Depends:	base >= 3 && < 5
+                    curl
   Exposed-modules:	Plotserver.Api
   extensions:       OverloadedStrings
   ghc-options:	    -Wall
-
