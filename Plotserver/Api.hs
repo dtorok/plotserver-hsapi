@@ -19,8 +19,8 @@ plotUrl dataset = "https://plot.prezi.com/" ++ dataset
 plotCat :: (String, String) -> String -> IO PlotData
 plotCat auth dataset = leftOrError <$> plotCatSafe auth dataset
 
-plotUpdate :: (String, String) -> String -> String -> String -> IO PlotData
-plotUpdate auth dataset key values = leftOrError <$> plotUpdateSafe auth dataset key values
+plotUpdate :: (String, String) -> String -> PlotDataRow -> IO PlotData
+plotUpdate auth dataset row = leftOrError <$> plotUpdateSafe auth dataset row
 
 plotDelete :: (String, String) -> String -> IO PlotData
 plotDelete auth dataset = leftOrError <$> plotDeleteSafe auth dataset
@@ -32,9 +32,9 @@ plotCatSafe auth dataset = getResult <$> curlGetResponse_ url_ opts where
 	url_ = actionUrl dataset "download"
 	opts = defaultOpts auth
 
-plotUpdateSafe :: (String, String) -> String -> String -> String -> IO (Either PlotData String)
-plotUpdateSafe auth dataset key values = getResult <$> curlGetResponse_ url_ opts where
-	postData = key ++ "," ++ values
+plotUpdateSafe :: (String, String) -> String -> PlotDataRow -> IO (Either PlotData String)
+plotUpdateSafe auth dataset row = getResult <$> curlGetResponse_ url_ opts where
+	postData = show $ PlotData [row]
 	url_ = actionUrl dataset "update"
 	opts = defaultOpts auth ++ [
 		CurlPost True, 
