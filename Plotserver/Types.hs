@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Plotserver.Types where
 
 import Data.List (intercalate)
