@@ -4,7 +4,7 @@ import Data.List (intercalate)
 import Data.List.Split (splitOn)
 
 -- TODO what if there isn't any password?
-data Config = Config {
+data PlotConfig = PlotConfig {
 	server :: String,
 	username :: String,
 	password :: String

@@ -1,6 +1,7 @@
 {-# LANGUAGE NamedFieldPuns  #-}
 
 module Plotserver.Api (
+	PlotConfig,
 	plotUrl, plotCat, plotUpdate, plotDelete
 	) where
 
@@ -11,15 +12,15 @@ import Plotserver.Types
 
 ------ API ------
 
-plotUrl :: Config -> String -> String
-plotUrl (Config {server}) dataset = server ++ "/" ++ dataset
+plotUrl :: PlotConfig -> String -> String
+plotUrl (PlotConfig {server}) dataset = server ++ "/" ++ dataset
 
-plotCat :: Config -> String -> IO (Either String PlotData)
+plotCat :: PlotConfig -> String -> IO (Either String PlotData)
 plotCat config dataset = response2either <$> curlGetResponse_ url_ opts where
 	url_ = actionUrl config dataset "download"
 	opts = defaultOpts config
 
-plotUpdate :: Config -> String -> PlotDataRow -> IO (Either String PlotData)
+plotUpdate :: PlotConfig -> String -> PlotDataRow -> IO (Either String PlotData)
 plotUpdate config dataset row = response2either <$> curlGetResponse_ url_ opts where
 	postData = show $ PlotData [row]
 	url_ = actionUrl config dataset "update"
@@ -28,19 +29,19 @@ plotUpdate config dataset row = response2either <$> curlGetResponse_ url_ opts w
 		CurlPostFields [postData]
 		]
 
-plotDelete :: Config -> String -> IO (Either String PlotData)
+plotDelete :: PlotConfig -> String -> IO (Either String PlotData)
 plotDelete config dataset = response2either <$> curlGetResponse_ url_ opts where
 	url_ = actionUrl config dataset "delete"
 	opts = defaultOpts config
 
 ------ helpers ------
 
-defaultOpts :: Config -> [CurlOption]
-defaultOpts Config {username, password} = [
+defaultOpts :: PlotConfig -> [CurlOption]
+defaultOpts PlotConfig {username, password} = [
 		CurlUserPwd (username ++ ":" ++ password)
 	]
 
-actionUrl :: Config -> String -> String -> String
+actionUrl :: PlotConfig -> String -> String -> String
 actionUrl config dataset action = plotUrl config dataset ++ "?" ++ action
 
 response2either :: CurlResponse_ [(String, String)] String -> Either String PlotData
