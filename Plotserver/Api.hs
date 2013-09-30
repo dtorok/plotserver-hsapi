@@ -27,12 +27,12 @@ plotDelete auth dataset = leftOrError <$> plotDeleteSafe auth dataset
 
 ------ SAFE API ------
 
-plotCatSafe :: (String, String) -> String -> IO (Either PlotData String)
+plotCatSafe :: (String, String) -> String -> IO (Either String PlotData)
 plotCatSafe auth dataset = safeResult <$> curlGetResponse_ url_ opts where
 	url_ = actionUrl dataset "download"
 	opts = defaultOpts auth
 
-plotUpdateSafe :: (String, String) -> String -> PlotDataRow -> IO (Either PlotData String)
+plotUpdateSafe :: (String, String) -> String -> PlotDataRow -> IO (Either String PlotData)
 plotUpdateSafe auth dataset row = safeResult <$> curlGetResponse_ url_ opts where
 	postData = show $ PlotData [row]
 	url_ = actionUrl dataset "update"
@@ -41,29 +41,29 @@ plotUpdateSafe auth dataset row = safeResult <$> curlGetResponse_ url_ opts wher
 		CurlPostFields [postData]
 		]
 
-plotDeleteSafe :: (String, String) -> String -> IO (Either PlotData String)
+plotDeleteSafe :: (String, String) -> String -> IO (Either String PlotData)
 plotDeleteSafe auth dataset = safeResult <$> curlGetResponse_ url_ opts where
 	url_ = actionUrl dataset "delete"
 	opts = defaultOpts auth
 
 ------ helpers ------
 
-leftOrError :: Either a String -> a
-leftOrError (Left a) = a
-leftOrError (Right msg) = error msg
+leftOrError :: Either String a -> a
+leftOrError (Right a) = a
+leftOrError (Left msg) = error msg
 
 defaultOpts :: (String, String) -> [CurlOption]
 defaultOpts (username, password) = [
-		CurlUserPwd (username ++ ":" ++ password),
-		CurlHttpProxyTunnel True, 
-		CurlProxy "localhost:8888"
+		CurlUserPwd (username ++ ":" ++ password)
+-- 		CurlHttpProxyTunnel True, 
+-- 		CurlProxy "localhost:8888"
 	]
 
 actionUrl :: String -> String -> String
 actionUrl dataset action = plotUrl dataset ++ "?" ++ action
 
-safeResult :: CurlResponse_ [(String, String)] String -> Either PlotData String
+safeResult :: CurlResponse_ [(String, String)] String -> Either String PlotData
 safeResult response 
-	| respStatus response == 200 = Left $ (read (respBody response) :: PlotData)
-	| otherwise = Right err where
+	| respStatus response == 200 = Right $ (read (respBody response) :: PlotData)
+	| otherwise = Left err where
 		err = "Error: " ++ show (respStatus response)
