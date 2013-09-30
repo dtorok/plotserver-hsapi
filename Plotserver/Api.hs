@@ -1,3 +1,5 @@
+{-# LANGUAGE NamedFieldPuns  #-}
+
 module Plotserver.Api (
 	plotUrl, plotCat, plotUpdate, plotDelete
 	) where
@@ -9,37 +11,37 @@ import Plotserver.Types
 
 ------ API ------
 
-plotUrl :: String -> String
-plotUrl dataset = "https://plot.prezi.com/" ++ dataset
+plotUrl :: Config -> String -> String
+plotUrl (Config {server}) dataset = server ++ "/" ++ dataset
 
-plotCat :: (String, String) -> String -> IO (Either String PlotData)
-plotCat auth dataset = response2either <$> curlGetResponse_ url_ opts where
-	url_ = actionUrl dataset "download"
-	opts = defaultOpts auth
+plotCat :: Config -> String -> IO (Either String PlotData)
+plotCat config dataset = response2either <$> curlGetResponse_ url_ opts where
+	url_ = actionUrl config dataset "download"
+	opts = defaultOpts config
 
-plotUpdate :: (String, String) -> String -> PlotDataRow -> IO (Either String PlotData)
-plotUpdate auth dataset row = response2either <$> curlGetResponse_ url_ opts where
+plotUpdate :: Config -> String -> PlotDataRow -> IO (Either String PlotData)
+plotUpdate config dataset row = response2either <$> curlGetResponse_ url_ opts where
 	postData = show $ PlotData [row]
-	url_ = actionUrl dataset "update"
-	opts = defaultOpts auth ++ [
+	url_ = actionUrl config dataset "update"
+	opts = defaultOpts config ++ [
 		CurlPost True,
 		CurlPostFields [postData]
 		]
 
-plotDelete :: (String, String) -> String -> IO (Either String PlotData)
-plotDelete auth dataset = response2either <$> curlGetResponse_ url_ opts where
-	url_ = actionUrl dataset "delete"
-	opts = defaultOpts auth
+plotDelete :: Config -> String -> IO (Either String PlotData)
+plotDelete config dataset = response2either <$> curlGetResponse_ url_ opts where
+	url_ = actionUrl config dataset "delete"
+	opts = defaultOpts config
 
 ------ helpers ------
 
-defaultOpts :: (String, String) -> [CurlOption]
-defaultOpts (uname, pwd) = [
-		CurlUserPwd (uname ++ ":" ++ pwd)
+defaultOpts :: Config -> [CurlOption]
+defaultOpts Config {username, password} = [
+		CurlUserPwd (username ++ ":" ++ password)
 	]
 
-actionUrl :: String -> String -> String
-actionUrl dataset action = plotUrl dataset ++ "?" ++ action
+actionUrl :: Config -> String -> String -> String
+actionUrl config dataset action = plotUrl config dataset ++ "?" ++ action
 
 response2either :: CurlResponse_ [(String, String)] String -> Either String PlotData
 response2either response 
