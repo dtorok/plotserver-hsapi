@@ -1,7 +1,6 @@
 {-# LANGUAGE NamedFieldPuns  #-}
 
 module Plotserver.Api (
-	PlotConfig,
 	plotUrl, plotCat, plotUpdate, plotDelete
 	) where
 
