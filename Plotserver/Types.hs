@@ -2,6 +2,7 @@ module Plotserver.Types where
 
 import Data.List (intercalate)
 import Data.List.Split (splitOn)
+import Data.Traversable
 
 -- TODO what if there isn't any password?
 data PlotConfig = PlotConfig {
@@ -22,8 +23,13 @@ instance Show PlotData where
 				showValues values = intercalate ", " (map show values)
 
 instance Read PlotData where
-	readsPrec _ s = [(PlotData dataRows, "")] where
+	readsPrec _ s = case dataRows of
+							Just dataRows' -> [(PlotData dataRows', "")]
+							Nothing -> []
+	 where
 		rows = filter (not.null) $ splitOn "\n" s
-		dataRows = map createDataRow rows
-		createDataRow row = createDataTuple $ splitOn "," row
-		createDataTuple (key:sValues) = (key, map read sValues) :: (String, [Int]) -- just for the readibility
+		dataRows = traverse createDataRow rows :: Maybe [PlotDataRow]
+		createDataRow row = createDataTuple $ splitOn "," row :: Maybe PlotDataRow
+
+		createDataTuple [] = Nothing
+		createDataTuple (key:sValues) = Just (key, map read sValues) :: Maybe PlotDataRow -- just for the readibility
