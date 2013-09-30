@@ -18,6 +18,6 @@ Library
   Build-Depends:   base >= 3 && < 5,
                    curl,
                    split
-  Exposed-modules: Plotserver.Api
+  Exposed-modules: Plotserver.Api, Plotserver.Types
   extensions:      OverloadedStrings
   ghc-options:     -Wall
