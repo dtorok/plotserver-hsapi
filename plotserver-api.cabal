@@ -1,7 +1,7 @@
 Name:              plotserver-api
-Version:           0.1
+Version:           0.2
 Synopsis:          Plotserver API
-Description:       A lightweight API for Prezi's opensourced Plotserver (https://github.com/prezi/plotserver)
+Description:       A lightweight API for Prezi's opensourced Plotserver (https:\/\/github.com\/prezi\/plotserver)
 License:           MIT
 License-file:      LICENSE
 Author:            Daniel Torok
