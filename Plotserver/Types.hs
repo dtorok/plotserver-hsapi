@@ -9,7 +9,7 @@ data PlotConfig = PlotConfig {
 	server :: String,
 	username :: String,
 	password :: String
-}
+} deriving (Eq, Show)
 
 data PlotData = PlotData [PlotDataRow]
 type PlotDataRow = (String, [Int])
